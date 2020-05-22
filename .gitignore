@@ -1,0 +1,17 @@
+.idea
+.vscode
+
+__pycache__/
+*.py[cod]
+
+.venv
+
+*.egg-info
+
+build/
+dist/
+
+poetry.lock
+
+.gitattributes
+
