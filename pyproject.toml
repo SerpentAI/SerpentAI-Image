@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "SerpentAI-Image"
-version = "0.1.0"
+version = "0.1.1"
 description = "Image class for Serpent.AI projects"
 readme = "README.md"
 authors = ["Nicholas Brochu <nicholas@serpent.ai>"]
