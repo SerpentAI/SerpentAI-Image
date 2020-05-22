@@ -155,11 +155,11 @@ class Image:
 
     @property
     def empty_mask(self):
-        return Image(np.empty_like(self.rgb, dtype=np.uint8))
+        return self.__class__(np.empty_like(self.rgb, dtype=np.uint8))
 
     @property
     def full_mask(self):
-        return Image((np.full_like(self.rgb, 255, dtype=np.uint8)))
+        return self.__class__((np.full_like(self.rgb, 255, dtype=np.uint8)))
 
     @property
     def inverted(self):
@@ -229,7 +229,7 @@ class Image:
         )
 
         if as_image:
-            return Image(array)
+            return self.__class__(array)
         else:
             return self._as_uint8_rgba(array)
 
@@ -245,7 +245,7 @@ class Image:
         array = skimage.transform.rescale(self.array, scale, multichannel=True)
 
         if as_image:
-            return Image(array)
+            return self.__class__(array)
         else:
             return self._as_uint8_rgba(array)
 
@@ -255,7 +255,7 @@ class Image:
         )
 
         if as_image:
-            return Image(rotate_array)
+            return self.__class__(rotate_array)
         else:
             return rotate_array
 
@@ -266,7 +266,7 @@ class Image:
         )
 
         if as_image:
-            return Image(blur_array)
+            return self.__class__(blur_array)
         else:
             return blur_array
 
@@ -276,7 +276,7 @@ class Image:
         invert_array = np.dstack((invert_array, self.array[:, :, 3]))
 
         if as_image:
-            return Image(invert_array)
+            return self.__class__(invert_array)
         else:
             return invert_array
 
@@ -284,7 +284,7 @@ class Image:
         desaturate_array = np.array(
             (
                 (self.rgb_normalized * ratio)
-                + (Image(self.grayscale_rgba).rgb_normalized * (1.0 - ratio))
+                + (self.__class__(self.grayscale_rgba).rgb_normalized * (1.0 - ratio))
             )
             * 255,
             dtype=np.uint8,
@@ -293,7 +293,7 @@ class Image:
         desaturate_array = np.dstack((desaturate_array, self.array[:, :, 3]))
 
         if as_image:
-            return Image(desaturate_array)
+            return self.__class__(desaturate_array)
         else:
             return desaturate_array
 
@@ -304,7 +304,7 @@ class Image:
         if segment_by == "COLOR":
             array = self.rgb_normalized
         else:
-            array = Image(self.grayscale_rgba).rgb_normalized
+            array = self.__class__(self.grayscale_rgba).rgb_normalized
 
         return skimage.segmentation.slic(
             array,
@@ -365,7 +365,7 @@ class Image:
 
         color_strip = np.array(skimage.color.hsv2rgb(color_strip) * 255, dtype=np.uint8)
 
-        return Image(color_strip)
+        return self.__class__(color_strip)
 
     def generate_gradients_array(self, shape="SQUARE", size=1):
         if shape not in ("SQUARE", "DISK"):
@@ -387,7 +387,7 @@ class Image:
             mask = skimage.filters.gaussian(mask, sigma=sigma)
             mask = np.array(mask * 255, dtype=np.uint8)
 
-        return Image(mask)
+        return self.__class__(mask)
 
     def generate_local_threshold_mask(self, size=51, sigma=0.0):
         if not size % 2:
@@ -404,7 +404,7 @@ class Image:
             mask = skimage.filters.gaussian(mask, sigma=sigma)
             mask = np.array(mask * 255, dtype=np.uint8)
 
-        return Image(mask)
+        return self.__class__(mask)
 
     def get_local_neighborhood(self, point, size, as_image=False):
         y0 = max(point[0] - size, 0)
@@ -415,7 +415,7 @@ class Image:
         local_neighborhood_array = self.array[y0:y1, x0:x1, :]
 
         if as_image:
-            return Image(local_neighborhood_array)
+            return self.__class__(local_neighborhood_array)
         else:
             return local_neighborhood_array
 
@@ -448,7 +448,7 @@ class Image:
         except ValueError:
             raise ValueError("Invalid image data!")
 
-        return Image(array)
+        return cls(array)
 
     @classmethod
     def from_file(cls, file_path):
@@ -463,14 +463,14 @@ class Image:
         except ValueError:
             raise ValueError(f"Invalid image data: 'f{file_path}'")
 
-        return Image(array)
+        return cls(array)
 
     @classmethod
     def copy(cls, image=None, keep_uuid=False):
         if not isinstance(image, cls):
             raise TypeError("'image' should be of type Image...")
 
-        image_copy = Image(image.array)
+        image_copy = cls(image.array)
 
         if keep_uuid:
             image_copy.uuid = image.uuid
